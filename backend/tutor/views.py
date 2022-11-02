@@ -3,14 +3,15 @@ from rest_framework.views import APIView
 from rest_framework import permissions
 
 from .authentication import JWTTutorAuthentication, create_access_token, create_refresh_token
-from .serializers import TeacherSerializer
+from .serializers import CategorySerializer, ChapterSerializer, CourseSerializer, CreateCourseSerializer, TeacherSerializer
 from rest_framework.response import Response
-from .  models import Teacher, TeacherToken
+from .  models import Chapter, Course, CourseCategory, Teacher, TeacherToken
 from rest_framework.permissions import AllowAny
 from rest_framework import status
 
 from django.contrib.auth.hashers import check_password
 import datetime
+from rest_framework import generics
 
 # Create your views here.
 class TeacherRegisterView(APIView):
@@ -112,3 +113,30 @@ class LogoutTeacherAPIView(APIView):
         }
         return response 
 
+class CategoryView(generics.ListCreateAPIView):
+    queryset = CourseCategory.objects.all()
+    serializer_class = CategorySerializer
+
+class CourseView(generics.ListCreateAPIView):
+    queryset = Course.objects.all()
+    
+    serializer_class = CourseSerializer
+
+class CreateCourseView(generics.ListCreateAPIView):
+    authentication_classes = [JWTTutorAuthentication]
+    queryset = Course.objects.all()
+    
+    serializer_class = CreateCourseSerializer    
+
+
+class TeacherCourseView(generics.ListCreateAPIView):
+    serializer_class = CourseSerializer
+
+    def get_queryset(self):
+        tutor_id = self.kwargs['tutor_id']
+        teacher = Teacher.objects.get(pk=tutor_id)
+        return Course.objects.filter(teacher=teacher)
+
+class ChapterView(generics.ListCreateAPIView):
+    queryset = Chapter.objects.all()
+    serializer_class = ChapterSerializer

@@ -82,7 +82,8 @@ class Account(AbstractBaseUser):
     def has_module_perms(self,add_label):
         return True
 
-
+    class Meta:
+        verbose_name_plural= 'Students'
 class UserToken(models.Model):
     user_id = models.IntegerField()
     token = models.CharField(max_length=255)

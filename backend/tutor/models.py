@@ -1,14 +1,19 @@
+from enum import unique
 from django.db import models
+from django.forms import ImageField
 # Teacher Model
 class Teacher (models.Model):
     
     first_name = models. CharField(max_length = 100)  
     last_name  = models.CharField(max_length=100)
-    email = models.CharField(max_length = 100)
+    email = models.CharField(max_length = 100,unique=True)
     password = models.CharField(max_length = 100)
     qualification = models.CharField(max_length = 200)
-    phone_number = models.CharField(max_length = 20)
+    skills = models.TextField()
+    phone_number = models.CharField(max_length = 20,unique=True)
     address = models.TextField()
+    dp              =models.ImageField(upload_to='photos/teachers_dp/',blank=True)
+
 
         
     create_date    = models.DateTimeField(auto_now_add=True)
@@ -27,14 +32,6 @@ class Teacher (models.Model):
         
 
 
-class TutorToken(models.Model):
-    tutor_id = models.IntegerField()
-    token = models.CharField(max_length=255)
-    created_at = models.DateTimeField(auto_now_add=True)
-    expired_at = models.DateTimeField()
-
-    def __str__(self):
-        return str(self.vendor_id) +' '+ self.token
 
 # Course Category Model
 class CourseCategory(models.Model):
@@ -43,6 +40,9 @@ class CourseCategory(models.Model):
 
     class Meta:
         verbose_name_plural="2. Course Categories"
+    def __str__(self):
+        return self.title
+
  
 #Course Model
 class Course(models.Model):
@@ -50,9 +50,23 @@ class Course(models.Model):
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     title=models.CharField(max_length=150)
     description=models.TextField()
+    image = models.ImageField(upload_to = 'photos/course_img/',blank=True)
+    technology=models.TextField()
     class Meta:
         verbose_name_plural="3. Courses"
- 
+    def __str__(self):
+        return self.title
+#Chapter Model
+class Chapter(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    title=models.CharField(max_length=150)
+    description=models.TextField()
+    video = models.FileField(upload_to = 'video/chapter/',blank=True)
+    remarks=models.TextField(null=True)
+    class Meta:
+        verbose_name_plural="4. Chapters"        
+    def __str__(self):
+        return self.title
 class TeacherToken(models.Model):
     tutor_id = models.IntegerField()
     token = models.CharField(max_length=255)
@@ -61,3 +75,4 @@ class TeacherToken(models.Model):
 
     def __str__(self):
         return str(self.teacher_id) +' '+ self.token
+

@@ -5,4 +5,8 @@ urlpatterns = [
     path('blockteacher/<int:id>/',views.BlockTeacher.as_view()),
     path('getteacherdetails/<int:id>/',views.GetTeacherDetailsView.as_view()),
     path('getteachers/',views.GetTeachersView.as_view()),
-] 
+
+    path('getuser/',views.GetUsersView.as_view()),
+    path('getuserdetails/<int:id>/',views.GetUserDetailsView.as_view()),
+    path('blockuser/<int:id>/',views.BlockUser.as_view()),
+]   

@@ -5,7 +5,7 @@ from .models import Account
 class StudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Account
-        fields=['username','email','mobile','password','qualification']
+        fields=['username','email','mobile','password','qualification','is_active']
         extra_kwargs = {
             'email' : {'required': True, 'write_only': True},
             'password' : {'write_only': True}
