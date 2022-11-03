@@ -12,6 +12,7 @@ from rest_framework import status
 from django.contrib.auth.hashers import check_password
 import datetime
 from rest_framework import generics
+from rest_framework.decorators import api_view,authentication_classes
 
 # Create your views here.
 class TeacherRegisterView(APIView):
@@ -93,10 +94,10 @@ class TeacherAPIView(APIView):
     authentication_classes = [JWTTutorAuthentication]
     def get(self, request):
         print(request)
-        print('koooooooooooooooooooyyyyyyyyyyyyyyy')
+        
         teacher=request.user
         print(teacher)
-        print('koooooooooooooooooooyyyyyyyyyyyyyyy')
+        
         teacher=Teacher.objects.get(email=teacher.email)
         serializer=TeacherSerializer(teacher,many=False)
         return Response(serializer.data)
@@ -122,11 +123,7 @@ class CourseView(generics.ListCreateAPIView):
     
     serializer_class = CourseSerializer
 
-class CreateCourseView(generics.ListCreateAPIView):
-    authentication_classes = [JWTTutorAuthentication]
-    queryset = Course.objects.all()
-    
-    serializer_class = CreateCourseSerializer    
+
 
 
 class TeacherCourseView(generics.ListCreateAPIView):
@@ -137,6 +134,78 @@ class TeacherCourseView(generics.ListCreateAPIView):
         teacher = Teacher.objects.get(pk=tutor_id)
         return Course.objects.filter(teacher=teacher)
 
-class ChapterView(generics.ListCreateAPIView):
-    queryset = Chapter.objects.all()
-    serializer_class = ChapterSerializer
+
+
+
+@api_view(['POST'])
+@authentication_classes([JWTTutorAuthentication])
+def addCourse(request):
+    data=request.data
+    tutor=request.user
+    
+    teacher=data['teacher']
+    
+    if str(tutor.id)==str(teacher):
+        
+        serializer = CreateCourseSerializer(data=data)
+        print('**********')
+        
+        if serializer.is_valid():
+            
+            serializer.save()
+            message = {'detail':'course added Successfuly'}
+        
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    else:
+        return Response('you are not allowed')
+
+
+@api_view(['PATCH'])
+@authentication_classes([JWTTutorAuthentication])
+def updateCourse(request,id):
+    data=request.data
+    tutor=request.user
+    teacher=data['teacher']
+    instance=Course.objects.get(id=id)
+    
+    if str(tutor.id)==str(teacher):
+        
+        serializer=CreateCourseSerializer(instance=instance,data=data)
+        print(serializer)
+        if serializer.is_valid():
+            serializer.save()
+           
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response('course updation is not working')
+
+@api_view(['DELETE'])
+@authentication_classes([JWTTutorAuthentication])
+def deleteCourse(request,id):
+    tutor=request.user
+    course=Course.objects.get(id=id)
+    
+    if tutor.id:
+        course.delete()
+        return Response('your course was deleted')
+    else:
+        return Response('course deletion is not working')
+
+
+@api_view(['POST'])
+@authentication_classes([JWTTutorAuthentication])
+def addChapter(request):
+    data=request.data
+    tutor=request.user
+    print(tutor)
+    crs=Course.objects.get(id=data['course'])
+    print(crs)
+    if crs.teacher==tutor:
+        serializer=ChapterSerializer(data=data)
+        print(serializer)
+        if serializer.is_valid():
+            serializer.save()
+            
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    else:
+        return Response('this course not in your course list')

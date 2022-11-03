@@ -60,6 +60,7 @@ class Course(models.Model):
 class Chapter(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     title=models.CharField(max_length=150)
+    
     description=models.TextField()
     video = models.FileField(upload_to = 'video/chapter/',blank=True)
     remarks=models.TextField(null=True)
@@ -67,6 +68,10 @@ class Chapter(models.Model):
         verbose_name_plural="4. Chapters"        
     def __str__(self):
         return self.title
+
+
+
+
 class TeacherToken(models.Model):
     tutor_id = models.IntegerField()
     token = models.CharField(max_length=255)

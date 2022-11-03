@@ -10,8 +10,10 @@ urlpatterns = [
 
     path('category/',views.CategoryView.as_view()),
     path('course/',views.CourseView.as_view()),
-    path('create_course/',views.CreateCourseView.as_view()),
+    path('add_course/',views.addCourse),
     path('teacher_course/<int:tutor_id>/',views.TeacherCourseView.as_view()),
-    path('chapter/',views.ChapterView.as_view()),
-    path('add_chapter/',views.ChapterView.as_view()),
+    path('update_course/<int:id>/',views.updateCourse),
+    path('delete_course/<int:id>/',views.deleteCourse),
+    path('add_chapter/',views.addChapter),
+    
 ]
