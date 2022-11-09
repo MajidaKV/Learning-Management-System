@@ -4,11 +4,13 @@ from student.models import Account
 from student.serializers import StudentSerializer
 from tutor.serializers import TeacherSerializer
 
-from tutor. models import Teacher
-from .serializers import UpdateTeacherSerializer, UpdateUserSerializer
+from tutor. models import CourseCategory, Teacher
+from .serializers import UpdateCategorySerializer, UpdateTeacherSerializer, UpdateUserSerializer, addCategorySerializer
 from student.authentication import JWTUserAuthentication
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser
+from rest_framework.decorators import api_view,authentication_classes,permission_classes
+from rest_framework import status
 
 # Create your views here.
 
@@ -125,3 +127,45 @@ class BlockUser(APIView):
             print("action failed")
             print(serializer.errors)
             return Response(serializer.errors)
+
+
+
+@api_view(['POST'])
+@permission_classes([IsAdminUser])
+@authentication_classes([JWTUserAuthentication])
+def addCategory(request):
+    data=request.data
+        
+    serializer = addCategorySerializer(data=data)
+    
+    if serializer.is_valid():
+        
+        serializer.save()
+        message = {'detail':'category added Successfuly'}
+    
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    else:
+        
+        print(serializer.errors)
+        return Response(serializer.errors)
+
+class VerifyCategory(APIView):
+    permission_classes=[IsAdminUser]
+    authentication_classes=[JWTUserAuthentication]
+    
+    def patch(self,request,id):
+        details = CourseCategory.objects.get(id=id)
+        if details.is_added == False:
+            details.is_added = True
+        else:
+            details.is_added= False
+        serializer = UpdateCategorySerializer(details,data=request.data,partial = True)
+        if serializer.is_valid():
+            serializer.save()
+            print("category verified")
+            return Response(serializer.data)
+        else:
+            print('action failed')
+            print(serializer.errors)
+            return Response(serializer.errors)
+    

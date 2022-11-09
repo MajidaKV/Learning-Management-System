@@ -9,4 +9,7 @@ urlpatterns = [
     path('getuser/',views.GetUsersView.as_view()),
     path('getuserdetails/<int:id>/',views.GetUserDetailsView.as_view()),
     path('blockuser/<int:id>/',views.BlockUser.as_view()),
+    
+    path('addcategory/',views.addCategory),
+    path('verify_category/<int:id>/',views.VerifyCategory.as_view()),
 ]   

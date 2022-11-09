@@ -11,7 +11,7 @@ class CategoryAdmin(admin.ModelAdmin):
 class CourseAdmin(admin.ModelAdmin):
     list_display = ('id','category','teacher','title','description','image','technology')
 class ChapterAdmin(admin.ModelAdmin):
-    list_display = ('id','course','title','description','video','remarks')
+    list_display = ('id','course','title','description','video','material_1','material_2','remarks')
 
 admin.site.register(models.Teacher, TeacherAdmin)
 admin.site.register(models.CourseCategory,CategoryAdmin)

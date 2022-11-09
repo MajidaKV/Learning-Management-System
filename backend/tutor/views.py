@@ -34,9 +34,7 @@ class TeacherLoginView(APIView):
     def post(self, request):
         email = request.data['email']
         password = request.data['password']
-        print('*****************************')
-        print(email,password)
-        print('*****************************')
+       
         
         teacher = Teacher.objects.filter(email=email).first()
         print(teacher,"123")
@@ -118,6 +116,20 @@ class CategoryView(generics.ListCreateAPIView):
     queryset = CourseCategory.objects.all()
     serializer_class = CategorySerializer
 
+class CategoryRequestView(APIView):
+    permission_classes=[AllowAny]
+    
+    def post(self, request):
+        data=request.data
+        serializer = CategorySerializer(data=request.data)
+        if serializer.is_valid():
+            title=data['title']
+            print(title)
+            
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 class CourseView(generics.ListCreateAPIView):
     queryset = Course.objects.all()
     
@@ -148,7 +160,7 @@ def addCourse(request):
     if str(tutor.id)==str(teacher):
         
         serializer = CreateCourseSerializer(data=data)
-        print('**********')
+        
         
         if serializer.is_valid():
             
@@ -198,14 +210,34 @@ def addChapter(request):
     data=request.data
     tutor=request.user
     print(tutor)
-    crs=Course.objects.get(id=data['course'])
-    print(crs)
-    if crs.teacher==tutor:
-        serializer=ChapterSerializer(data=data)
-        print(serializer)
-        if serializer.is_valid():
-            serializer.save()
-            
-        return Response(serializer.data, status=status.HTTP_200_OK)
+    course=Course.objects.get(id=data['course'])
+    print(data['title'])
+    if not Chapter.objects.filter(course=course,title=data['title']).exists():
+        if course.teacher==tutor:
+                         
+            serializer=ChapterSerializer(data=data)
+            print(serializer)
+            if serializer.is_valid():
+                serializer.save()
+                
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        else:
+            return Response('this course not in your course list')
     else:
-        return Response('this course not in your course list')
+            return Response('not allowed')
+@api_view(['GET'])
+@authentication_classes([JWTTutorAuthentication])
+def getChapter(request):
+    data=request.data
+    tutor=request.user
+    print(tutor)
+    
+    
+    
+    serializer=ChapterSerializer(data=data)
+    print(serializer)
+    if serializer.is_valid():
+        serializer.save()      
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    

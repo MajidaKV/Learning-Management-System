@@ -35,13 +35,16 @@ class Teacher (models.Model):
 
 # Course Category Model
 class CourseCategory(models.Model):
-    title=models.CharField(max_length=150)
+    title=models.CharField(max_length=150,unique=True)
     description=models.TextField()
+
+    is_added=models.BooleanField(default=False,blank=True)
 
     class Meta:
         verbose_name_plural="2. Course Categories"
     def __str__(self):
         return self.title
+
 
  
 #Course Model
@@ -52,6 +55,9 @@ class Course(models.Model):
     description=models.TextField()
     image = models.ImageField(upload_to = 'photos/course_img/',blank=True)
     technology=models.TextField()
+
+    is_Paid        = models.BooleanField(default=False)
+    
     class Meta:
         verbose_name_plural="3. Courses"
     def __str__(self):
@@ -59,10 +65,12 @@ class Course(models.Model):
 #Chapter Model
 class Chapter(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    title=models.CharField(max_length=150)
+    title =models.CharField(max_length=150)
     
     description=models.TextField()
     video = models.FileField(upload_to = 'video/chapter/',blank=True)
+    material_1=models.FileField(upload_to = 'material_1/chapter/',blank=True)
+    material_2=models.ImageField(upload_to = 'material_2/chapter/',blank=True)
     remarks=models.TextField(null=True)
     class Meta:
         verbose_name_plural="4. Chapters"        
