@@ -3,9 +3,9 @@ from rest_framework.views import APIView
 from rest_framework import permissions
 
 from .authentication import JWTTutorAuthentication, create_access_token, create_refresh_token
-from .serializers import CategorySerializer, ChapterSerializer, CourseSerializer, CreateCourseSerializer, TeacherSerializer
+from .serializers import AssignmentSerializer, CategorySerializer, ChapterSerializer, CourseSerializer, CreateCourseSerializer, QuizQuestionSerializer, QuizSerializer, TeacherSerializer
 from rest_framework.response import Response
-from .  models import Chapter, Course, CourseCategory, Teacher, TeacherToken
+from .  models import Assignments, Chapter, Course, CourseCategory, Quiz, QuizQuestions, Teacher, TeacherToken
 from rest_framework.permissions import AllowAny
 from rest_framework import status
 
@@ -197,9 +197,14 @@ def deleteCourse(request,id):
     tutor=request.user
     course=Course.objects.get(id=id)
     
-    if tutor.id:
-        course.delete()
-        return Response('your course was deleted')
+    
+    teacher=course.teacher
+    print(teacher)
+    if teacher.id==tutor.id:
+        if tutor.id:
+            course.delete()
+            return Response('your course was deleted')
+        
     else:
         return Response('course deletion is not working')
 
@@ -226,18 +231,168 @@ def addChapter(request):
             return Response('this course not in your course list')
     else:
             return Response('not allowed')
-@api_view(['GET'])
+
+
+@api_view(['PATCH'])
 @authentication_classes([JWTTutorAuthentication])
-def getChapter(request):
+def updateChapter(request,id):
+    data=request.data
+    tutor=request.user
+    course=data['course']
+    instance=Chapter.objects.get(id=id)
+    teacher=instance.course.teacher
+    print(teacher)
+    if teacher.id==tutor.id:
+        
+        serializer=ChapterSerializer(instance=instance,data=data)
+        print(serializer)
+        if serializer.is_valid():
+            serializer.save()
+           
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response('chapter updation is not working')
+
+@api_view(['DELETE'])
+@authentication_classes([JWTTutorAuthentication])
+def deleteChapter(request,id):
+    
+    tutor=request.user
+    
+    chapter=Chapter.objects.get(id=id)
+    teacher=chapter.course.teacher
+    print(teacher)
+    if teacher.id==tutor.id:
+        
+        if tutor.id:
+            chapter.delete()
+            return Response('your chapter was deleted')
+        
+    
+    else:
+        return Response('chapter deletion is not working')
+
+
+
+@api_view(['POST'])
+@authentication_classes([JWTTutorAuthentication])
+def addAssignment(request,id):
+    data=request.data
+    tutor=request.user
+    print(tutor)
+    crs=Course.objects.get(id=id)
+    
+    print(crs.teacher)
+    if not Assignments.objects.filter(title=data['title']).exists():
+        if crs.teacher==tutor:
+                         
+            serializer=AssignmentSerializer(data=data)
+            print(serializer)
+            
+            if serializer.is_valid():
+                serializer.save()
+                
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        else:
+            return Response('this course not in your course list')
+    else:
+            return Response('not allowed')
+
+@api_view(['PATCH'])
+@authentication_classes([JWTTutorAuthentication])
+def updateAssignment(request,id):
+    data=request.data
+    tutor=request.user
+    course=data['course']
+    instance=Assignments.objects.get(id=id)
+    teacher=instance.course.teacher
+    print(teacher)
+    if teacher.id==tutor.id:
+        
+        serializer=AssignmentSerializer(instance=instance,data=data)
+        print(serializer)
+        if serializer.is_valid():
+            serializer.save()
+           
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response('assignment updation is not working')
+
+
+@api_view(['DELETE'])
+@authentication_classes([JWTTutorAuthentication])
+def deleteAssignment(request,id):
+    
+    tutor=request.user
+    
+    assignment=Assignments.objects.get(id=id)
+    teacher=assignment.course.teacher
+    print(teacher)
+    if teacher.id==tutor.id:
+        
+        if tutor.id:
+            assignment.delete()
+            return Response('your assignment was deleted')
+        
+    
+    else:
+        return Response('assignment deletion is not working')
+
+
+@api_view(['POST'])
+@authentication_classes([JWTTutorAuthentication])
+def addQuiz(request,id):
     data=request.data
     tutor=request.user
     print(tutor)
     
+    crs=Course.objects.get(id=id)
     
+    print(crs.teacher)
+    if not Quiz.objects.filter(title=data['title']).exists():
+        if crs.teacher==tutor:
+                         
+            serializer=QuizSerializer(data=data)
+            print(serializer)
+            
+            if serializer.is_valid():
+                serializer.save()
+                
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        else:
+            return Response('this course not in your course list')
+    else:
+            return Response('not allowed')
+
+
+@api_view(['POST'])
+@authentication_classes([JWTTutorAuthentication])
+def assignQuiz(request,id):
+    data=request.data
+    tutor=request.user
+    print(tutor)
     
-    serializer=ChapterSerializer(data=data)
-    print(serializer)
-    if serializer.is_valid():
-        serializer.save()      
-        return Response(serializer.data, status=status.HTTP_200_OK)
+    quiz=Quiz.objects.get(id=id)
     
+    print(quiz.teacher)
+    print(type(quiz.teacher))
+    print(type(tutor))
+    if not QuizQuestions.objects.filter(questions=data['questions']).exists():
+        print('???????????????????')
+        if quiz.teacher==tutor:
+            print('************')
+                         
+            serializer=QuizQuestionSerializer(data=data)
+            print(serializer)
+            
+            if serializer.is_valid():
+                serializer.save()
+                
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        else:
+            return Response('this course not in your course list')
+    else:
+            return Response('not allowed')

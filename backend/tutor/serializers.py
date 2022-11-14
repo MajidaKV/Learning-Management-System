@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from . models import Chapter, Course, CourseCategory, Teacher
+from . models import Assignments, Chapter, Course, CourseCategory, Quiz, Teacher,QuizQuestions
 from django.contrib.auth.hashers import make_password
 
 class TeacherSerializer(serializers.ModelSerializer):
@@ -56,3 +56,20 @@ class ChapterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Chapter
         fields = ['id','course','title','description','video','material_1','material_2','remarks']
+class AssignmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Assignments
+        fields = ['id','course','title','description','assignment_file']
+
+class QuizSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Quiz
+        fields = ['id','teacher','course','title','detail','add_time']
+
+class QuizQuestionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = QuizQuestions
+        fields = ['id','quiz','questions','ans1','ans2','ans3','ans4','right_ans','add_time']
+        extra_kwargs = {
+            'right_ans' : {'write_only' : True}
+        }

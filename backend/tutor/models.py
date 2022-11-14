@@ -1,6 +1,8 @@
 from enum import unique
 from django.db import models
 from django.forms import ImageField
+
+from student.models import Account
 # Teacher Model
 class Teacher (models.Model):
     
@@ -77,7 +79,52 @@ class Chapter(models.Model):
     def __str__(self):
         return self.title
 
+# Assignment model
+class Assignments(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    title =models.CharField(max_length=150)
+    description= models.TextField()
+    assignment_file=models.FileField(upload_to = 'assignment/chapter/')
 
+    is_done=models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name_plural="5. Assignments"        
+    def __str__(self):
+        return self.title
+
+# Quiz Models
+class Quiz(models.Model):
+    teacher=models.ForeignKey(Teacher,on_delete=models.CASCADE,null=True)
+    course=models.ForeignKey(Course,on_delete=models.CASCADE,null=True)
+    title=models.CharField(max_length=150)
+    detail=models.TextField(max_length=150)
+    add_time=models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name_plural="6.Quiz" 
+
+class QuizQuestions(models.Model):
+    quiz=models.ForeignKey(Quiz,on_delete=models.CASCADE,null=True)
+    questions=models.CharField(max_length=200)
+    ans1=models.CharField(max_length=200)
+    ans2=models.CharField(max_length=200)
+    ans3=models.CharField(max_length=200)
+    ans4=models.CharField(max_length=200)
+    right_ans=models.CharField(max_length=200)
+    add_time=models.DateTimeField(auto_now_add=True)
+    class Meta:
+        verbose_name_plural="7.Quiz Questions" 
+
+class CourseQuiz(models.Model):
+    course=models.ForeignKey(Course,on_delete=models.CASCADE,null=True)
+    quiz=models.ForeignKey(Quiz,on_delete=models.CASCADE,null=True)
+    add_time=models.DateTimeField(auto_now_add=True)
+    class Meta:
+        verbose_name_plural="8.Course Quiz " 
+
+
+    
 
 
 class TeacherToken(models.Model):
