@@ -57,6 +57,7 @@ class Course(models.Model):
     description=models.TextField()
     image = models.ImageField(upload_to = 'photos/course_img/',blank=True)
     technology=models.TextField()
+    price=models.IntegerField(default=0)
 
     is_Paid        = models.BooleanField(default=False)
     
@@ -64,16 +65,22 @@ class Course(models.Model):
         verbose_name_plural="3. Courses"
     def __str__(self):
         return self.title
+
+    # def related_courses(self):
+    #     related_courses=Course.objects.filter(used_techs__icontains=self.used_techs)
+    #     return serializers.serialize('json',related_courses)
+
 #Chapter Model
 class Chapter(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    chapter_no =models.IntegerField(null=True)
     title =models.CharField(max_length=150)
-    
     description=models.TextField()
     video = models.FileField(upload_to = 'video/chapter/',blank=True)
     material_1=models.FileField(upload_to = 'material_1/chapter/',blank=True)
     material_2=models.ImageField(upload_to = 'material_2/chapter/',blank=True)
     remarks=models.TextField(null=True)
+
     class Meta:
         verbose_name_plural="4. Chapters"        
     def __str__(self):

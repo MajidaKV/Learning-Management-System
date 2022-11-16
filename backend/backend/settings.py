@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'adminPanel',
     'tutor',
     'student',
+    'payment',
 ]
 
 MIDDLEWARE = [

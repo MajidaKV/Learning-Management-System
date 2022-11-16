@@ -44,18 +44,18 @@ class CategorySerializer(serializers.ModelSerializer):
 class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
-        fields = ['id','category','teacher','title','description','image','technology']   
+        fields = ['id','category','teacher','title','description','image','technology','price']   
         depth=1     
         
 class CreateCourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
-        fields = ['id','category','teacher','title','description','image','technology']
+        fields = ['id','category','teacher','title','description','image','technology','price']
 
 class ChapterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Chapter
-        fields = ['id','course','title','description','video','material_1','material_2','remarks']
+        fields = ['id','course','chapter_no','title','description','video','material_1','material_2','remarks']
 class AssignmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Assignments

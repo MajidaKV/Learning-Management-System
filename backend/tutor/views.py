@@ -345,13 +345,13 @@ def deleteAssignment(request,id):
 def addQuiz(request,id):
     data=request.data
     tutor=request.user
-    print(tutor)
-    
+    print(tutor.id)
+    print(data,'+++++++++++++++++++++')
     crs=Course.objects.get(id=id)
-    
+    print(data['teacher'],'---------------------')
     print(crs.teacher)
     if not Quiz.objects.filter(title=data['title']).exists():
-        if crs.teacher==tutor:
+        if  str(data['teacher'])==str(tutor.id) and crs.teacher==tutor:
                          
             serializer=QuizSerializer(data=data)
             print(serializer)
@@ -372,17 +372,14 @@ def addQuiz(request,id):
 def assignQuiz(request,id):
     data=request.data
     tutor=request.user
-    print(tutor)
-    
+       
     quiz=Quiz.objects.get(id=id)
-    
     print(quiz.teacher)
-    print(type(quiz.teacher))
-    print(type(tutor))
+    
     if not QuizQuestions.objects.filter(questions=data['questions']).exists():
-        print('???????????????????')
+        
         if quiz.teacher==tutor:
-            print('************')
+            
                          
             serializer=QuizQuestionSerializer(data=data)
             print(serializer)
