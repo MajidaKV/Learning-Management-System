@@ -346,9 +346,9 @@ def addQuiz(request,id):
     data=request.data
     tutor=request.user
     print(tutor.id)
-    print(data,'+++++++++++++++++++++')
+    print(data)
     crs=Course.objects.get(id=id)
-    print(data['teacher'],'---------------------')
+    print(data['teacher'])
     print(crs.teacher)
     if not Quiz.objects.filter(title=data['title']).exists():
         if  str(data['teacher'])==str(tutor.id) and crs.teacher==tutor:
