@@ -87,7 +87,7 @@ DATABASES = {
     'default': {
         'ENGINE': config('ENGINE'),
         'NAME':  config('NAME'),
-        'USER':  config('USER'),
+        'USER':  config('USER1'),
         'PASSWORD': config('PASSWORD'),
         'HOST': config('HOST'),
         'PORT': config('PORT'),
@@ -135,6 +135,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR/'static'
+# STATICFILES_DIRS=os.path.join(BASE_DIR, 'static',)
+STATICFILES_DIRS = (os.path.join(BASE_DIR, '/static'),)
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field

@@ -28,4 +28,4 @@ urlpatterns = [
     path('admin_api/', include('adminPanel.urls')),
     path('payment_api/',include('payment.urls')),
     path('api-auth/',include('rest_framework.urls')),
-]+static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
+]+static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT,)
