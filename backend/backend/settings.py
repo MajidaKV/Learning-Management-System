@@ -25,9 +25,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-pfoq)a_x@$(cm@#8=9tv!sm3=m8enz9n^!_*wj*6ldl)o!nv%1'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -89,7 +89,7 @@ DATABASES = {
         'NAME':  config('NAME'),
         'USER':  config('USER1'),
         'PASSWORD': config('PASSWORD'),
-        'HOST': config('HOST'),
+        'HOST': "localhost",
         'PORT': "",
     }
 }
