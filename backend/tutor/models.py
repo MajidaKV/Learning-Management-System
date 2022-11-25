@@ -64,7 +64,7 @@ class Course(models.Model):
     class Meta:
         verbose_name_plural="3. Courses"
     def __str__(self):
-        return self.title
+        return str(self.id)
 
     # def related_courses(self):
     #     related_courses=Course.objects.filter(used_techs__icontains=self.used_techs)
@@ -100,6 +100,19 @@ class Assignments(models.Model):
     def __str__(self):
         return self.title
 
+
+class UserAssignment(models.Model):
+    userassignment=models.FileField(upload_to='user/assignments',null=True)
+    assignmentsname=models.ForeignKey(Assignments,on_delete=models.CASCADE)
+    studentname=models.ForeignKey(Account,on_delete=models.CASCADE)
+    tutorname=models.ForeignKey(Teacher,on_delete=models.CASCADE)
+    coursename=models.ForeignKey(Course,on_delete=models.CASCADE)
+    
+
+    class Meta:
+        verbose_name_plural='9.User Assignments'
+
+
 # Quiz Models
 class Quiz(models.Model):
     teacher=models.ForeignKey(Teacher,on_delete=models.CASCADE,null=True)
@@ -110,6 +123,9 @@ class Quiz(models.Model):
 
     class Meta:
         verbose_name_plural="6.Quiz" 
+
+    def __str__(self):
+        return str(self.id) 
 
 class QuizQuestions(models.Model):
     quiz=models.ForeignKey(Quiz,on_delete=models.CASCADE,null=True)
@@ -123,14 +139,44 @@ class QuizQuestions(models.Model):
     class Meta:
         verbose_name_plural="7.Quiz Questions" 
 
-class CourseQuiz(models.Model):
-    course=models.ForeignKey(Course,on_delete=models.CASCADE,null=True)
-    quiz=models.ForeignKey(Quiz,on_delete=models.CASCADE,null=True)
-    add_time=models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return str(self.id) 
+
+class UserQuizAnswers(models.Model):
+    QuizQuestions=models.ForeignKey(QuizQuestions,on_delete=models.CASCADE,null=True)
+    studentname=models.ForeignKey(Account,on_delete=models.CASCADE,null=True)
+    question_no=models.IntegerField()
+    answer=models.CharField(max_length=200)
+   
     class Meta:
-        verbose_name_plural="8.Course Quiz " 
+        verbose_name_plural="8.User Quiz Answer Sheet" 
+        
+    def __str__(self):
+        return str(self.id) 
 
-
+class Certificate(models.Model):
+    username =models.ForeignKey(Account,on_delete=models.CASCADE,null=True)
+    is_eligible=models.BooleanField(default=True)
+    course=models.CharField(max_length=255,null=True)
+   
+    
+    class Meta:
+        verbose_name_plural="10. Certificate" 
+    def __str__(self):
+        return str(self.username)
+        
+class PostCertificate(models.Model):
+    certificate=models.ForeignKey(Certificate,on_delete=models.CASCADE,null=True)
+    usercertificate=models.FileField(upload_to='user/certificate',null=False)
+    success=models.BooleanField(default=True)
+    course=models.IntegerField(null=True)
+    
+    
+    class Meta:
+        verbose_name_plural="11. postCertificate" 
+        
+    def __str__(self):
+        return str(self.certificate)
     
 
 
@@ -142,4 +188,7 @@ class TeacherToken(models.Model):
 
     def __str__(self):
         return str(self.teacher_id) +' '+ self.token
+
+
+
 

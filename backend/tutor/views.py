@@ -3,9 +3,9 @@ from rest_framework.views import APIView
 from rest_framework import permissions
 
 from .authentication import JWTTutorAuthentication, create_access_token, create_refresh_token
-from .serializers import AssignmentSerializer, CategorySerializer, ChapterSerializer, CourseSerializer, CreateCourseSerializer, QuizQuestionSerializer, QuizSerializer, TeacherSerializer
+from .serializers import AssignmentSerializer, CategorySerializer, ChapterSerializer, CourseSerializer, CreateCourseSerializer, PostCertificateSerializer, QuizQuestionSerializer, QuizSerializer, TeacherSerializer, teachercheckcertificateserializers
 from rest_framework.response import Response
-from .  models import Assignments, Chapter, Course, CourseCategory, Quiz, QuizQuestions, Teacher, TeacherToken
+from .  models import Assignments, Certificate, Chapter, Course, CourseCategory, PostCertificate, Quiz, QuizQuestions, Teacher, TeacherToken
 from rest_framework.permissions import AllowAny
 from rest_framework import status
 
@@ -236,22 +236,26 @@ def addChapter(request):
 @api_view(['PATCH'])
 @authentication_classes([JWTTutorAuthentication])
 def updateChapter(request,id):
-    data=request.data
-    tutor=request.user
-    course=data['course']
-    instance=Chapter.objects.get(id=id)
-    teacher=instance.course.teacher
-    print(teacher)
-    if teacher.id==tutor.id:
-        
-        serializer=ChapterSerializer(instance=instance,data=data)
-        print(serializer)
-        if serializer.is_valid():
-            serializer.save()
-           
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response('chapter updation is not working')
+    try:
+        data=request.data
+        tutor=request.user
+        course=data['course']
+        instance=Chapter.objects.get(id=id)
+        teacher=instance.course.teacher
+        print(teacher)
+        if teacher.id==tutor.id:
+            
+            serializer=ChapterSerializer(instance=instance,data=data)
+            print(serializer)
+            if serializer.is_valid():
+                serializer.save()
+            
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response('chapter updation is not working')
+        return Response('this course is not in your list')
+    except:
+        return Response('something went wrong')
 
 @api_view(['DELETE'])
 @authentication_classes([JWTTutorAuthentication])
@@ -393,3 +397,63 @@ def assignQuiz(request,id):
             return Response('this course not in your course list')
     else:
             return Response('not allowed')
+
+
+
+@api_view(['POST'])
+@authentication_classes([JWTTutorAuthentication])
+def Postcertificate(request,id):
+    data=request.data
+    print(data)
+    user=data['certificate']
+    user=Certificate.objects.get(username=user)
+    print('------------------')
+    print(user)
+    print(user.id)
+       
+    if user:
+        if not PostCertificate.objects.filter(certificate=user).exists() :
+            
+            serializer=PostCertificateSerializer(data=data)
+            print(serializer)
+            
+            if serializer.is_valid():
+                
+                serializer.save()
+                print(serializer)
+                print(serializer.data)
+                
+                return Response(serializer.data)
+            else:
+                return Response('you are not eligible')
+        else:
+            return Response('already provided certificate')
+
+    else:
+            return Response('you are not eligible')
+   
+
+@api_view(['GET'])
+@authentication_classes([JWTTutorAuthentication])
+def teachercheckcertificate(request,id):
+    user=request.user
+    print(user)
+    print(id)
+    s=str(id)
+    print(s)
+    certificate= Certificate.objects.filter(is_eligible=True)
+    print(certificate)
+    print(certificate.values())
+    for i in certificate:
+        s=i.course
+    print(type(s))
+        
+    if certificate:
+        print("mmmmmmmmm")
+        k=Certificate.objects.get(course=s)
+        print(k)
+        print('kkkkkkkkkkkkkk')
+        serializer=teachercheckcertificateserializers(k)
+        return Response(serializer.data)
+    else:
+        return Response(status=status.HTTP_302_FOUND)    

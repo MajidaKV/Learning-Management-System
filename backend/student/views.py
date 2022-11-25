@@ -5,19 +5,22 @@ from requests import request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import exceptions
+from payment.models import Order
+from tutor.serializers import ChapterSerializer, PostCertificateSerializer, QuizAnswerSerializer, QuizQuestionSerializer, QuizSerializer, userAssignmentSerailizer
 
-from tutor.models import Chapter, Course
+from tutor.models import Assignments, Certificate, Chapter, Course, PostCertificate, Quiz, QuizQuestions, UserQuizAnswers
 
 from .authentication import JWTUserAuthentication, create_access_token
 
 from .serializers import CourseSerializer, RecomentedCourseSerializer, StudentSerializer, VerifyOtpSerializer
-from .  models import Account, UserToken
+from .  models import Account, Marks, TotalMarks, UserToken
 from rest_framework import status
 from django.contrib.auth.hashers import check_password
 
 from .verify import send,check
 from django.db.models import Q
 from rest_framework.permissions import AllowAny,IsAdminUser,IsAuthenticated
+from rest_framework.decorators import api_view,permission_classes,authentication_classes
 
 # Create your views here.
 class StudentRegisterView(APIView):
@@ -143,9 +146,231 @@ class CourseDetails(APIView):
         return Response (serializer.data)
 
 
-class getChapter(APIView):
-    permission_classes = [IsAuthenticated]
-    authentication_classes = [JWTUserAuthentication]
+@api_view(['GET'])
+@authentication_classes([JWTUserAuthentication])
+# permission_classes=[IsAuthenticated]
+def AllChapter(request,id):
+    users=request.user
+    print(users.id)
+    print(users)
+       
+    names=Order.objects.filter(user=users,order_course=id,isPaid=True).first()
+    print(names)
+    if names:
+        course=Course.objects.get(id=id)
+        print(course)
+        s=course.id
+        chapterr=Chapter.objects.filter(course=s)
+        serializer=ChapterSerializer(chapterr,many=True)
+        return Response(serializer.data)
+    else:
+        status=Course.objects.filter(id=id,is_Paid=False).first()
+        print(status)
+        print(status.id)
+        if status:
+            chapter=Chapter.objects.filter(chapter_no=1,course=status.id)
+            print(chapter)
+            serializer=ChapterSerializer(chapter,many=True)
+            return Response(serializer.data)
+        return Response("there is no course")
+
+@api_view(['GET'])
+@authentication_classes([JWTUserAuthentication])
+# permission_classes=[IsAuthenticated]
+def AllAssignments(request,id):
+    users=request.user
+    print(users.id)
+    print(users)
+       
+    names=Order.objects.filter(user=users,order_course=id,isPaid=True).first()
+    print(names)
+    if names:
+        course=Course.objects.get(id=id)
+        print(course)
+        s=course.id
+        assignment=Assignments.objects.filter(course=s)
+        serializer=ChapterSerializer(assignment,many=True)
+        return Response(serializer.data)
+    else:
+        
+        return Response("You have to purchase this course")       
+
+
+@api_view(['POST'])  
+@authentication_classes([JWTUserAuthentication])
+def UserPostAssignment(request):
     
-    def get(self,request):
-       pass
+    users=request.user
+    print(users.id)
+    print(users)
+    data=request.data
+    print(data)
+    users=Order.objects.filter(user=users,isPaid=True)
+    print(users,"check order")
+    # for i in users:
+    #     print (i.order_course)
+    serializer = userAssignmentSerailizer(data=data)
+    print('***************66666666666666666666***************')
+    print(serializer)
+    if serializer.is_valid():
+        print('__________6666666666666666_______')
+        serializer.save()
+        print(serializer.data)
+        return Response(serializer.data)
+    else:
+        return Response("please add correct details")
+
+
+@api_view(['GET'])  
+@authentication_classes([JWTUserAuthentication])       
+def GetQuiz(request,id):
+    users=request.user
+    print(users.id)
+    print(users)
+       
+    names=Order.objects.filter(user=users,order_course=id,isPaid=True).first()
+    print(names)
+    if names:
+        course=Course.objects.get(id=id)
+        print(course)
+        s=course.id
+        assignment=Quiz.objects.filter(course=s)
+        serializer=QuizSerializer(assignment,many=True)
+        return Response(serializer.data)
+    else:
+        
+        return Response("You have to purchase this course")    
+
+@api_view(['GET'])  
+@authentication_classes([JWTUserAuthentication])       
+def GetQuizQuestions(request,id):
+    user=purchaseCourse=Order.objects.filter(user=request.user,isPaid=True)
+    print(purchaseCourse)
+    if user:
+        questions=QuizQuestions.objects.filter(quiz=id)
+        print(questions)
+        serailzer=QuizQuestionSerializer(questions,many=True)
+    return Response(serailzer.data)
+
+@api_view(['POST'])  
+@authentication_classes([JWTUserAuthentication])
+def userPostAnswer(request,id):
+    # user=purchaseCourse=Order.objects.filter(user=request.user,isPaid=True)
+    try:
+        user=Order.objects.filter(user=request.user,isPaid=True)
+        # print(purchaseCourse)
+        data=request.data
+        if user:
+            
+            answer=QuizQuestions.objects.filter(quiz__id=id)
+            
+            
+            totalmarks=0
+            
+            # print(mark,'printappendfirst')
+            if not UserQuizAnswers.objects.filter(question_no=data['question_no']).exists():
+                
+                if QuizQuestions.objects.filter(id=data['question_no']):
+                    serializer=QuizAnswerSerializer(data=data)
+                    print(serializer)
+                    if QuizQuestions.objects.filter(right_ans=data['answer']):
+                        
+                        totalmarks+=10
+                        print('******************')
+                        
+                        
+                    else:
+                        pass
+                    if serializer.is_valid():
+                        serializer.save()
+                        marksss = Marks.objects.create(user=request.user,
+                                                    mark=totalmarks,question_no=request.data['question_no'],Quiz=request.data['QuizQuestions'])
+                        print(marksss)
+                        #print
+                        mrks=Marks.objects.filter(mark=10)
+                        print(mrks)
+                        total=[]
+                        for i in mrks:
+                            print(i.mark)
+                            total.append(i.mark)
+                        print(total)
+                        s=sum(total)
+                        totamarks=TotalMarks.objects.create(
+                            user=request.user,
+                            totalmark=s
+                        )
+                        print(sum(total))
+                        print('###################')
+                        print(totamarks)
+                                
+                        return Response(serializer.data)
+                    else:
+                        return Response("something went wrong")
+                else:
+                     return Response("please add correct question number")
+            else:
+                # print(mark,'printappendlast')
+                return Response("You already answered  this question")
+        else:
+            return Response("please add correct details")
+    except:
+        return Response("something went wrong")
+            
+@api_view(['GET'])  
+@authentication_classes([JWTUserAuthentication])  
+def ApplyCertificate(request,id):
+    user=request.user
+    print(user,'uuu')
+    users=Order.objects.filter(order_course=id,user=request.user,isPaid=True)
+
+    if users:
+        print('************************')
+        print(users)
+        print('************************')
+        
+        print(users.values())
+        for i in users:
+            s=i.user_id
+        if s==user.id:
+            print('kkkkkkkkkkkkk')
+    
+        try:
+            if Quiz.objects.filter(course=id):
+                
+                    userintotal=TotalMarks.objects.filter(user=request.user).last()
+                    print(userintotal.totalmark)
+                    
+                    if int(userintotal.totalmark)>=int(90):
+                        print("elegible")
+                        if not Certificate.objects.filter(username=request.user).exists():
+                            certificate=Certificate.objects.create(
+                                username=request.user,
+                                is_eligible=True,
+                                course=id
+                            )
+                            return Response("You are eligible for certficate")
+                        else:
+                            return Response("you are allredy applied,certicate is processing")
+                    else:
+                        return Response("You are not eligible for certficate")
+            else:
+                return Response("please attend quiz")
+        except:
+            return Response("please attend quiz..........................")
+    else:
+            return Response("please pay the course")
+    
+       
+    
+@api_view(['GET'])  
+@authentication_classes([JWTUserAuthentication])   
+def GetCertificate(request,id):
+    user=request.user.id
+    print(user)
+    users=PostCertificate.objects.filter(success=True,course=str(id))
+    print(users)
+    if users:
+        serailzer=PostCertificateSerializer(users,many=True)
+        return Response(serailzer.data)
+    else:
+        return Response("not found certificate")    

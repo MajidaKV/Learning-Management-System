@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from . models import Assignments, Chapter, Course, CourseCategory, Quiz, Teacher,QuizQuestions
+from . models import Assignments, Certificate, Chapter, Course, CourseCategory, PostCertificate, Quiz, Teacher,QuizQuestions, UserAssignment, UserQuizAnswers
 from django.contrib.auth.hashers import make_password
 
 class TeacherSerializer(serializers.ModelSerializer):
@@ -61,6 +61,12 @@ class AssignmentSerializer(serializers.ModelSerializer):
         model = Assignments
         fields = ['id','course','title','description','assignment_file']
 
+class userAssignmentSerailizer(serializers.ModelSerializer):
+    class Meta:
+        model=UserAssignment
+        fields=['id','userassignment','assignmentsname','studentname','tutorname','coursename']        
+        
+
 class QuizSerializer(serializers.ModelSerializer):
     class Meta:
         model = Quiz
@@ -73,3 +79,21 @@ class QuizQuestionSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'right_ans' : {'write_only' : True}
         }
+
+
+class QuizAnswerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=UserQuizAnswers
+        fields = ['id','QuizQuestions','question_no','studentname','answer']
+
+class PostCertificateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=PostCertificate
+        fields = ['id','certificate','usercertificate','success','course']
+      
+        
+class teachercheckcertificateserializers(serializers.ModelSerializer):
+    class Meta:
+        model=Certificate
+        fields = ['id','username','is_eligible','course']
+                

@@ -3,5 +3,6 @@ from .import views
 
 
 urlpatterns = [
-   path('course_enrollment/<int:id>/',views.PaymentStatus.as_view())
+   path('payment/',views.Payment,name="payment"),
+   path('status/',views.paymentstatus,name="status"),
 ]
