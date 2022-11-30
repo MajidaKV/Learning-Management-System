@@ -16,6 +16,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path,include
 
+
+from rest_framework_swagger.views import get_swagger_view
+
+schema_view = get_swagger_view(title='Pastebin API')
+
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -28,4 +33,7 @@ urlpatterns = [
     path('admin_api/', include('adminPanel.urls')),
     path('payment_api/',include('payment.urls')),
     path('api-auth/',include('rest_framework.urls')),
+
+    path('documentation/',schema_view),
+
 ]+static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT,)

@@ -35,6 +35,7 @@ ALLOWED_HOSTS = ["*"]
 INSTALLED_APPS = [
 
     'rest_framework',
+    'rest_framework_swagger',
     'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -73,6 +74,9 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
+             'libraries' : {
+                'staticfiles': 'django.templatetags.static', 
+            }
         },
     },
 ]
@@ -159,3 +163,4 @@ CORS_ALLOW_CREDENTIALS = True  # front- end will get those cookies
 MEDIA_URL='/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+REST_FRAMEWORK = { 'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema' }
