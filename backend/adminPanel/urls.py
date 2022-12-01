@@ -12,4 +12,8 @@ urlpatterns = [
     
     path('addcategory/',views.addCategory),
     path('verify_category/<int:id>/',views.VerifyCategory.as_view()),
+
+    path('totalofamount/',views.getTotalamount.as_view(),name="getTotalamount"),
+    path('adminpercentage/',views.adminPercentage.as_view(),name="adminPercentage"),
+    path('TeacherAmount/',views.TeacherAmount.as_view(),name="TeacherAmount")
 ]   

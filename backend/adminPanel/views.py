@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
+from backend.payment.models import Order
 from student.models import Account
 from student.serializers import StudentSerializer
 from tutor.serializers import TeacherSerializer
@@ -168,4 +169,64 @@ class VerifyCategory(APIView):
             print('action failed')
             print(serializer.errors)
             return Response(serializer.errors)
+
+
+class getTotalamount(APIView):
+    permission_classes=[IsAdminUser]
     
+    def get(self,request):
+        amount=Order.objects.filter(isPaid=True)
+        print(amount)
+        j=0
+        for i in amount:
+            
+            print(type(j))
+            s=i.order_amount
+            k=int(s)
+            print(type(k))
+            j=k+j
+            print(j)
+        print(j)
+        return Response(data={"total income":j})
+
+
+class adminPercentage(APIView):
+    permission_classes=[IsAdminUser]
+    def get(self,request):
+        
+        amount=Order.objects.filter(isPaid=True)
+        print(amount)
+        j=0
+        for i in amount:
+            
+            print(type(j))
+            s=i.order_amount
+            k=int(s)
+            print(type(k))
+            j=k+j
+            print(j)
+            adminperctage=(j*12)/100
+            print(adminperctage)
+            # AdminPercentage.objects.create(
+            #     Totalamount = j,
+            #     percentage=12,
+            #     adminPercentageamount= adminperctage,
+                
+            # )
+        return Response(data={"Total  Amount":j,"percentage":12,"admin Percentage amount":adminperctage})
+
+class TeacherAmount(APIView):
+    permission_classes=[IsAdminUser]
+    def get(self,request):
+        if Order.objects.filter(isPaid=True):
+            teacher=Order.objects.all()
+            print(teacher.values())
+            s=teacher.values_list('order_course_id')
+            print('llllllllllllllllll')
+            print(s)
+            li=[]
+            for i in s:
+                
+                print(i)
+                li.append(i)
+            print(li,"appeid list")
