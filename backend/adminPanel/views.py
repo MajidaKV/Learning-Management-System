@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
-from backend.payment.models import Order
+from payment.models import Order
 from student.models import Account
 from student.serializers import StudentSerializer
 from tutor.serializers import TeacherSerializer
