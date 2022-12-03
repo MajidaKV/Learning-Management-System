@@ -173,6 +173,7 @@ class VerifyCategory(APIView):
 
 class getTotalamount(APIView):
     permission_classes=[IsAdminUser]
+    authentication_classes=[JWTUserAuthentication]
     
     def get(self,request):
         amount=Order.objects.filter(isPaid=True)
@@ -192,6 +193,7 @@ class getTotalamount(APIView):
 
 class adminPercentage(APIView):
     permission_classes=[IsAdminUser]
+    authentication_classes=[JWTUserAuthentication]
     def get(self,request):
         
         amount=Order.objects.filter(isPaid=True)
@@ -217,6 +219,7 @@ class adminPercentage(APIView):
 
 class TeacherAmount(APIView):
     permission_classes=[IsAdminUser]
+    authentication_classes=[JWTUserAuthentication]
     def get(self,request):
         if Order.objects.filter(isPaid=True):
             teacher=Order.objects.all()
